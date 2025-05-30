@@ -2,28 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Car } from '../../entities/car.entity';
 import { CreateCarDto } from '../../dtos/create-car.dto';
 import { UpdateCarDto } from '../../dtos/update-car.dto';
-import { FindAllCarsQueryDto } from '../../dtos/find-all-cars-query.dto';
-
 @Injectable()
 export class CarRepository {
   private cars = new Map<string, Car>();
 
-  findAll(filters?: FindAllCarsQueryDto): Car[] {
-    let carsResult = Array.from(this.cars.values());
-
-    if (filters?.color) {
-      carsResult = carsResult.filter(
-        (c) => c.color.toLowerCase() === filters.color?.toLowerCase(),
-      );
-    }
-
-    if (filters?.brand) {
-      carsResult = carsResult.filter(
-        (c) => c.brand.toLowerCase() === filters.brand?.toLowerCase(),
-      );
-    }
-
-    return carsResult;
+  findAll(): Car[] {
+    return Array.from(this.cars.values());
   }
 
   findById(id: string): Car | undefined {
@@ -37,7 +21,7 @@ export class CarRepository {
   }
 
   update(id: string, carData: UpdateCarDto): Car | undefined {
-    const existingCar = this.cars.get(id);
+    const existingCar = this.findById(id);
 
     if (!existingCar) {
       return undefined;

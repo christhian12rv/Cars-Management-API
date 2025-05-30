@@ -27,10 +27,16 @@ export class CarController {
     type: [Car],
   })
   @Get()
-  findAll(@Query() { color, brand }: FindAllCarsQueryDto) {
-    return this.carService.findAll({ color, brand });
+  findAll(@Query() filters: FindAllCarsQueryDto) {
+    return this.carService.findAll(filters);
   }
 
+  @ApiOperation({ summary: 'Buscar um automóvel pelo id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Automóvel encontrado',
+    type: Car,
+  })
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.carService.findById(id);
@@ -51,11 +57,27 @@ export class CarController {
     return this.carService.create(dto);
   }
 
+  @ApiOperation({ summary: 'Modificar um automóvel existente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Automóvel modificado com sucesso',
+    type: Car,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos',
+  })
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCarDto) {
     return this.carService.update(id, dto);
   }
 
+  @ApiOperation({ summary: 'Deletar um automóvel existente pelo id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Automóvel deletado com sucesso',
+    type: Car,
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.carService.remove(id);

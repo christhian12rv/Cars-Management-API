@@ -10,47 +10,62 @@ import { FindAllCarsQueryDto } from '../../dtos/find-all-cars-query.dto';
 export class CarService {
   private readonly logger = new Logger(CarService.name);
 
-  constructor(private readonly carRepo: CarRepository) {}
+  constructor(private readonly carRepository: CarRepository) {}
 
   findAll(filters?: FindAllCarsQueryDto): Car[] {
     this.logger.log(
       `Starting findAll with filters: ${JSON.stringify(filters)}`,
     );
 
-    const cars = this.carRepo.findAll(filters);
+    let carsResult = this.carRepository.findAll();
 
-    this.logger.log(`Completed findAll - found ${cars.length} cars`);
+    if (filters && carsResult.length) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (!value) continue;
 
-    return cars;
+        carsResult = carsResult.filter((car) => {
+          const carValue = car[key as keyof Car];
+          return (
+            typeof carValue === 'string' &&
+            typeof value === 'string' &&
+            carValue.toLowerCase() === value.toLowerCase()
+          );
+        });
+      }
+    }
+
+    this.logger.log(`Completed findAll - found ${carsResult.length} cars`);
+
+    return carsResult;
   }
 
   findById(id: string): Car | undefined {
     this.logger.log(`Starting findById with ID: ${id}`);
 
-    const car = this.carRepo.findById(id);
+    const existingCar = this.carRepository.findById(id);
 
-    if (!car) {
+    if (!existingCar) {
       this.logger.log(`Failed findById - Car with ID ${id} not found`);
       throw new CarNotFoundException();
     }
 
     this.logger.log(`Completed findById - Found car with ID: ${id}`);
-    return car;
+    return existingCar;
   }
 
-  create(dto: CreateCarDto): Car {
+  create(createCarData: CreateCarDto): Car {
     this.logger.log(`Starting create`);
 
-    const car = this.carRepo.create(dto);
+    const car = this.carRepository.create(createCarData);
 
     this.logger.log(`Completed create - Car created with ID: ${car.id}`);
     return car;
   }
 
-  update(id: string, dto: UpdateCarDto): Car | undefined {
+  update(id: string, updateCarData: UpdateCarDto): Car | undefined {
     this.logger.log(`Starting update with ID: ${id}`);
 
-    const carUpdated = this.carRepo.update(id, dto);
+    const carUpdated = this.carRepository.update(id, updateCarData);
 
     if (!carUpdated) {
       this.logger.log(`Failed update - Car with ID ${id} not found`);
@@ -66,7 +81,7 @@ export class CarService {
   remove(id: string): void {
     this.logger.log(`Starting delete with ID: ${id}`);
 
-    const carDeleted = this.carRepo.delete(id);
+    const carDeleted = this.carRepository.delete(id);
 
     if (!carDeleted) {
       this.logger.log(`Failed delete - Car with ID ${id} not found`);

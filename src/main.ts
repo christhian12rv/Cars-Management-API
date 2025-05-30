@@ -11,17 +11,17 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
 
-    const config = new DocumentBuilder()
+    const swaggerConfig = new DocumentBuilder()
       .setTitle('API de gerenciamento de carros')
       .setDescription(
         'API desenvolvida em NestJs responsável por gerenciar o cadastro e uso de carros e seus motoristas',
       )
       .setVersion('1.0')
-      .addTag('cars')
       .build();
 
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, documentFactory);
+    const swaggerDocumentFactory = () =>
+      SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, swaggerDocumentFactory);
 
     app.useGlobalFilters(new HttpExceptionFilter());
 
@@ -38,4 +38,4 @@ async function bootstrap() {
   }
 }
 
-bootstrap();
+void bootstrap();

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, Length, MinLength } from 'class-validator';
 
 export class CreateCarDto {
   @ApiProperty({
@@ -8,8 +8,9 @@ export class CreateCarDto {
     maxLength: 7,
     example: 'OTM2A20',
   })
-  @IsString({ message: 'Placa deve ser uma string' })
   @Length(7, 7, { message: 'Placa deve conter 7 caracteres' })
+  @IsString({ message: 'Placa deve ser uma string' })
+  @IsNotEmpty({ message: 'Placa é obrigatório' })
   plate: string;
 
   @ApiProperty({
@@ -17,8 +18,9 @@ export class CreateCarDto {
     minLength: 2,
     example: 'Vermelho',
   })
-  @IsString({ message: 'Cor deve ser uma string' })
   @MinLength(2, { message: 'Cor deve conter no mínimo 2 caracteres' })
+  @IsString({ message: 'Cor deve ser uma string' })
+  @IsNotEmpty({ message: 'Cor é obrigatório' })
   color: string;
 
   @ApiProperty({
@@ -26,7 +28,8 @@ export class CreateCarDto {
     minLength: 2,
     example: 'Chevrolet',
   })
-  @IsString({ message: 'Marca deve ser uma string' })
   @MinLength(2, { message: 'Marca deve conter no mínimo 2 caracteres' })
+  @IsString({ message: 'Marca deve ser uma string' })
+  @IsNotEmpty({ message: 'Marca é obrigatório' })
   brand: string;
 }
