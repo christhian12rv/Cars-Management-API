@@ -1,26 +1,41 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ZodFilter } from './shared/filters/ZodFilter';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { ValidationPipe } from './shared/pipes/validation.pipe';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
 
-  const config = new DocumentBuilder()
-    .setTitle('Cars Management API')
-    .setDescription(
-      'API developed in NestJs responsible for managing the registration and use of cars and their drivers',
-    )
-    .setVersion('1.0')
-    .addTag('cars')
-    .build();
+  try {
+    const app = await NestFactory.create(AppModule);
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+    const config = new DocumentBuilder()
+      .setTitle('API de gerenciamento de carros')
+      .setDescription(
+        'API desenvolvida em NestJs responsável por gerenciar o cadastro e uso de carros e seus motoristas',
+      )
+      .setVersion('1.0')
+      .addTag('cars')
+      .build();
 
-  app.useGlobalFilters(new ZodFilter());
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
 
-  await app.listen(process.env.PORT ?? 3000);
+    app.useGlobalFilters(new HttpExceptionFilter());
+
+    app.useGlobalPipes(new ValidationPipe());
+
+    const port = process.env.PORT ?? 5500;
+    await app.listen(port);
+
+    logger.log(`Application is running on: http://localhost:${port}`);
+    logger.log(`Swagger is running on: http://localhost:${port}/api`);
+  } catch (error) {
+    logger.error('Failed to start application:', error);
+    process.exit(1);
+  }
 }
 
 bootstrap();
