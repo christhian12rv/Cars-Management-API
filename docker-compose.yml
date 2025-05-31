@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  app:
+    build: .
+    container_name: cars-management-api
+    restart: always
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+    environment:
+      - PORT=3000
+    dns:
+      - 8.8.8.8
