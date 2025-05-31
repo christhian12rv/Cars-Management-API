@@ -79,7 +79,7 @@ export class CarController {
     type: Car,
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.carService.remove(id);
+  delete(@Param('id') id: string) {
+    return this.carService.delete(id);
   }
 }

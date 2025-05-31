@@ -29,5 +29,5 @@ export class CarUsageResponseDto extends BaseResponseDto {
     description: 'Data final de utilização do automóvel',
     example: '2025-05-30T13:16:40.734Z',
   })
-  endedAt?: string;
+  endedAt?: Date;
 }

@@ -79,7 +79,7 @@ export class DriverController {
     type: Driver,
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.driverService.remove(id);
+  delete(@Param('id') id: string) {
+    return this.driverService.delete(id);
   }
 }

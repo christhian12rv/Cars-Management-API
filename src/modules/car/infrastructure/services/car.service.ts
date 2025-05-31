@@ -5,6 +5,7 @@ import { Car } from '../../entities/car.entity';
 import { UpdateCarDto } from '../../dtos/update-car.dto';
 import { CarNotFoundException } from '../../exceptions/car.exception';
 import { FindAllCarsQueryDto } from '../../dtos/find-all-cars-query.dto';
+import { filterResultsWithQuery } from 'src/shared/utils/filterResultsWithQuery.util';
 
 @Injectable()
 export class CarService {
@@ -19,19 +20,8 @@ export class CarService {
 
     let carsResult = this.carRepository.findAll();
 
-    if (filters && carsResult.length) {
-      for (const [key, value] of Object.entries(filters)) {
-        if (!value) continue;
-
-        carsResult = carsResult.filter((car) => {
-          const carValue = car[key as keyof Car];
-          return (
-            typeof carValue === 'string' &&
-            typeof value === 'string' &&
-            carValue.toLowerCase() === value.toLowerCase()
-          );
-        });
-      }
+    if (filters) {
+      carsResult = filterResultsWithQuery(carsResult, filters);
     }
 
     this.logger.log(`Completed findAll - found ${carsResult.length} cars`);
@@ -50,24 +40,25 @@ export class CarService {
     }
 
     this.logger.log(`Completed findById - Found car with ID: ${id}`);
+
     return existingCar;
   }
 
   create(createCarData: CreateCarDto): Car {
     this.logger.log(`Starting create`);
 
-    const car = this.carRepository.create(createCarData);
+    const newCar = this.carRepository.create(createCarData);
 
-    this.logger.log(`Completed create - Car created with ID: ${car.id}`);
-    return car;
+    this.logger.log(`Completed create - Car created with ID: ${newCar.id}`);
+    return newCar;
   }
 
   update(id: string, updateCarData: UpdateCarDto): Car | undefined {
     this.logger.log(`Starting update with ID: ${id}`);
 
-    const carUpdated = this.carRepository.update(id, updateCarData);
+    const updatedCar = this.carRepository.update(id, updateCarData);
 
-    if (!carUpdated) {
+    if (!updatedCar) {
       this.logger.log(`Failed update - Car with ID ${id} not found`);
       throw new CarNotFoundException();
     }
@@ -75,15 +66,16 @@ export class CarService {
     this.logger.log(
       `Completed update - Car with ID ${id} updated successfully`,
     );
-    return carUpdated;
+
+    return updatedCar;
   }
 
-  remove(id: string): void {
+  delete(id: string): void {
     this.logger.log(`Starting delete with ID: ${id}`);
 
-    const carDeleted = this.carRepository.delete(id);
+    const deletedCar = this.carRepository.delete(id);
 
-    if (!carDeleted) {
+    if (!deletedCar) {
       this.logger.log(`Failed delete - Car with ID ${id} not found`);
       throw new CarNotFoundException();
     }

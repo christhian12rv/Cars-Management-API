@@ -5,6 +5,7 @@ import { Driver } from '../../entities/driver.entity';
 import { UpdateDriverDto } from '../../dtos/update-driver.dto';
 import { DriverNotFoundException } from '../../exceptions/driver.exception';
 import { FindAllDriversQueryDto } from '../../dtos/find-all-drivers-query.dto';
+import { filterResultsWithQuery } from 'src/shared/utils/filterResultsWithQuery.util';
 
 @Injectable()
 export class DriverService {
@@ -19,20 +20,13 @@ export class DriverService {
 
     let driversResult = this.driverRepository.findAll();
 
-    if (filters && driversResult.length) {
-      for (const [key, value] of Object.entries(filters)) {
-        if (!value) continue;
-
-        driversResult = driversResult.filter((driver) => {
-          const driverValue = driver[key as keyof Driver];
-          return (
-            typeof driverValue === 'string' &&
-            typeof value === 'string' &&
-            driverValue.toLowerCase() === value.toLowerCase()
-          );
-        });
-      }
+    if (filters) {
+      driversResult = filterResultsWithQuery(driversResult, filters);
     }
+
+    this.logger.log(
+      `Completed findAll - found ${driversResult.length} drivers`,
+    );
 
     return driversResult;
   }
@@ -48,24 +42,28 @@ export class DriverService {
     }
 
     this.logger.log(`Completed findById - Found driver with ID: ${id}`);
+
     return driver;
   }
 
   create(createDriverData: CreateDriverDto): Driver {
     this.logger.log(`Starting create`);
 
-    const driver = this.driverRepository.create(createDriverData);
+    const newDriver = this.driverRepository.create(createDriverData);
 
-    this.logger.log(`Completed create - Driver created with ID: ${driver.id}`);
-    return driver;
+    this.logger.log(
+      `Completed create - Driver created with ID: ${newDriver.id}`,
+    );
+
+    return newDriver;
   }
 
   update(id: string, updateDriverData: UpdateDriverDto): Driver | undefined {
     this.logger.log(`Starting update with ID: ${id}`);
 
-    const driverUpdated = this.driverRepository.update(id, updateDriverData);
+    const updatedDriver = this.driverRepository.update(id, updateDriverData);
 
-    if (!driverUpdated) {
+    if (!updatedDriver) {
       this.logger.log(`Failed update - Driver with ID ${id} not found`);
       throw new DriverNotFoundException();
     }
@@ -73,15 +71,16 @@ export class DriverService {
     this.logger.log(
       `Completed update - Driver with ID ${id} updated successfully`,
     );
-    return driverUpdated;
+
+    return updatedDriver;
   }
 
-  remove(id: string): void {
+  delete(id: string): void {
     this.logger.log(`Starting delete with ID: ${id}`);
 
-    const driverDeleted = this.driverRepository.delete(id);
+    const deletedDriver = this.driverRepository.delete(id);
 
-    if (!driverDeleted) {
+    if (!deletedDriver) {
       this.logger.log(`Failed delete - Driver with ID ${id} not found`);
       throw new DriverNotFoundException();
     }

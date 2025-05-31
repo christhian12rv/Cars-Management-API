@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Car } from '../../entities/car.entity';
 import { CreateCarDto } from '../../dtos/create-car.dto';
 import { UpdateCarDto } from '../../dtos/update-car.dto';
+
 @Injectable()
 export class CarRepository {
   private cars = new Map<string, Car>();

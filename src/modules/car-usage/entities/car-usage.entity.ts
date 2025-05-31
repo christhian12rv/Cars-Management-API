@@ -29,5 +29,5 @@ export class CarUsage extends BaseEntity {
     description: 'Data final de utilização do automóvel',
     example: '2025-06-02T09:00:32.330Z',
   })
-  endedAt?: string;
+  endedAt?: Date;
 }

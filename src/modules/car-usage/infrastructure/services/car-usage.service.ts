@@ -29,6 +29,7 @@ export class CarUsageService {
 
     const carUsagesResult = this.carUsageRepository.findAll();
 
+    // Returns an array of CarUsageResponseDto containing driver and car data
     const carUsagesResponse: CarUsageResponseDto[] = carUsagesResult
       .map((carUsage) => {
         const driver = this.driverRepository.findById(carUsage.driverId);
