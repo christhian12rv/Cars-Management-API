@@ -1,6 +1,10 @@
 ## Description
 
-API developed with NestJs responsible for managing the registration and use of cars and their drivers.
+API developed with NestJs responsible for managing the registration and use of cars and their drivers. The project does not use an external database. All application data is stored in memory during runtime.
+
+**Swagger** is configured in the project. To access it, simply navigate to the **/api** url.
+
+The project is live here for testing, feel free to check it out: https://cars-management-api-r0bz.onrender.com/
 
 ## Project setup without Docker
 
@@ -8,7 +12,7 @@ The project uses **NodeJs v23**. To install it, visit https://nodejs.org/en/down
 
 You can setup the project using **pnpm v10**
 
-## Install pnpm
+### Install pnpm
 
 ```bash
 $ npm install -g pnpm@latest-10
